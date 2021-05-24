@@ -14,24 +14,36 @@ namespace Geek.Server
         {
             try
             {
-                HttpHandlerFactory.SetExtraHandlerGetter(HotfixMgr.GetHttpHandler);
-                TcpHandlerFactory.SetExtraHandlerGetter(Geek.Server.Message.MsgFactory.Create, msgId => HotfixMgr.GetHandler<BaseTcpHandler>(msgId));
-
                 if (isReload)
                 {
                     //热更
-                    LOGGER.Info("hotfix load success");
+                    LOGGER.Info("load配置表...");
+                    //配置表代码在hotfix，热更后当前域的GameDataManager=null，需要重新加载配置表
+                    (bool beanSuccess, string msg) = GameDataManager.ReloadAll();
+                    if(!beanSuccess)
+                    {
+                        LOGGER.Info("load配置表异常...");
+                        LOGGER.Error(msg);
+                        return false;
+                    }
+
+                    LOGGER.Info("清除缓存的agent...");
                     await ActorManager.ActorsForeach((actor) =>
                     {
                         actor.SendAsync(actor.ClearCacheAgent, false);
                         return Task.CompletedTask;
                     });
+                    LOGGER.Info("hotfix load success");
                 }else
                 {
                     //起服
                     if (!await Start())
                         return false;
                 }
+				
+				//成功了才替换msg&handler
+				HttpHandlerFactory.SetExtraHandlerGetter(HotfixMgr.GetHttpHandler);
+                TcpHandlerFactory.SetExtraHandlerGetter(Geek.Server.Message.MsgFactory.Create, msgId => HotfixMgr.GetHandler<BaseTcpHandler>(msgId));
                 return true;
             }
             catch(Exception e)
@@ -60,9 +72,12 @@ namespace Geek.Server
                 ComponentTools.RegistAllComps();
 
                 LOGGER.Info("load配置表...");
-                (bool success, string msg) = GameDataManager.ReloadAll();
-                if (!success)
+                (bool beanSuccess, string msg) = GameDataManager.ReloadAll();
+                if (!beanSuccess)
+                {
+                    LOGGER.Error(msg);
                     return false;
+                }
 
                 LOGGER.Info("激活所有全局actor...");
                 var taskList = new List<Task>();
