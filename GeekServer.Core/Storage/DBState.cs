@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.ComponentModel;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace Geek.Server
 {
@@ -8,6 +9,47 @@ namespace Geek.Server
     {
         ///<summary>mongodbId=actorId</summary>
         public long _id;
+
+        List<BaseState> bsList = new List<BaseState>();
+        public DBState()
+        {
+            //TODO 改成生成dll时注入
+            var arr = GetType().GetProperties(System.Reflection.BindingFlags.Public 
+                | System.Reflection.BindingFlags.Instance 
+                | (System.Reflection.BindingFlags.SetProperty & System.Reflection.BindingFlags.SetProperty));
+
+            foreach (var p in arr)
+            {
+                if(p.PropertyType.IsSubclassOf(typeof(BaseState)))
+                {
+                    var bs = (BaseState)p.GetValue(this);
+                    bsList.Add(bs);
+                }
+            }
+        }
+
+        public override bool IsChanged
+        {
+            get
+            {
+                if (_stateChanged)
+                    return _stateChanged;
+                foreach(var bs in bsList)
+                {
+                    if (bs.IsChanged)
+                        return true;
+                }
+                return false;
+            }
+        }
+
+        public override void ClearChanges()
+        {
+            //base.ClearChanges();
+            _stateChanged = false;
+            foreach (var bs in bsList)
+                bs.ClearChanges();
+        }
     }
 
     //https://github.com/Fody/PropertyChanged/wiki/EventInvokerSelectionInjection
@@ -29,7 +71,9 @@ namespace Geek.Server
     public abstract class BaseState
     {
         protected bool _stateChanged;
+        /// <summary>需要在actor线程内不调用才安全</summary>
         public virtual bool IsChanged => _stateChanged;
+        /// <summary>需要在actor线程内不调用才安全</summary>
         public virtual void ClearChanges()
         {
             _stateChanged = false;
