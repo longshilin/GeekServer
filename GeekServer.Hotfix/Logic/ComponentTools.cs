@@ -6,6 +6,8 @@
         {
             //注册组件,所有actor的所有组件
             ComponentMgr.Singleton.RegistComp<ServerActor, ServerComp>();
+
+            ComponentMgr.Singleton.RegistComp<SampleActor, SampleComp>();
         }
     }
 }

@@ -31,8 +31,9 @@ namespace Geek.Server
             }catch(Exception e)
             {
                 LOGGER.Fatal(e.ToString());
-                await Task.Delay(500);
-                return await LoadState<TState>(aId);
+                //await Task.Delay(500);
+                //return await LoadState<TState>(aId);
+                return default;
             }
         }
 

@@ -103,6 +103,7 @@ namespace Geek.Server
                 if (actor == null || actor.ReadOnly)
                     continue;
 
+                //关服时直接调用，actor逻辑已停，安全
                 state.UpdateChangeVersion();
                 if (!state.IsChangedRefDB(true))
                     continue;

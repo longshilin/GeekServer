@@ -35,7 +35,7 @@ namespace Geek.Server
             var types = assembly.GetTypes();
             foreach (var type in types)
             {
-                var att = (MsgMapping)type.GetCustomAttribute(typeof(MsgMapping), true);
+                var att = (TcpMsgMapping)type.GetCustomAttribute(typeof(TcpMsgMapping), true);
                 if (att == null)
                     continue;
                 var msgIdField = att.Msg.GetField("MsgId", BindingFlags.Static | BindingFlags.Public);

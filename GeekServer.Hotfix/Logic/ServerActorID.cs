@@ -5,6 +5,7 @@ namespace Geek.Server
     {
         Normal = 1,
         Rank,
+        Test,
     }
 
     public class ServerActorID

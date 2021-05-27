@@ -175,7 +175,7 @@ namespace Geek.Server
 
         void addTcpHandler(Type type)
         {
-            var attribute = (MsgMapping)type.GetCustomAttribute(typeof(MsgMapping), true);
+            var attribute = (TcpMsgMapping)type.GetCustomAttribute(typeof(TcpMsgMapping), true);
             if (attribute == null) return;
             var msgIdField = attribute.Msg.GetField("MsgId", BindingFlags.Static | BindingFlags.Public);
             if (msgIdField == null) return;

@@ -1,5 +1,5 @@
 ﻿using System;
-using Geek.Server.ConfigBean;
+using Geek.Server.Config;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 
@@ -82,6 +82,7 @@ namespace Geek.Server
                 LOGGER.Info("激活所有全局actor...");
                 var taskList = new List<Task>();
                 taskList.Add(activeActorAndItsComps<ServerActorAgent>(ServerActorID.GetID(ActorType.Normal)));
+                taskList.Add(activeActorAndItsComps<SampleActorAgent>(ServerActorID.GetID(ActorType.Test)));
                 //激活其他全局actor
 
                 await Task.WhenAll(taskList);
