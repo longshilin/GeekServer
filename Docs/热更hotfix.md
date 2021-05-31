@@ -2,7 +2,7 @@
 GeekServer支持不停服热更新逻辑。
 #### 热更思路
 游戏中的所有状态放在App工程中，始终存在于内存，不能热更。Actor和Component的逻辑使用代理模式（Agent）放到Hotfix工程。热更时载入新的dll（GeekServer.Hotfix.dll），清除所有老的Agent，所有新逻辑重新从Actor/Component获取新的Agent汇入新dll中执行热更后的逻辑，达到热更目的。正在执行老dll逻辑的代码获取的Agent依然来自热更前的老Dll中，等待老dll中的逻辑执行完后清理掉内存中老的dll。底层使用接口驱动热更dll中的逻辑。
-需要注意的是，热更时新的dll需要放在新的目录下面，然后再载入内存，因为老的dll可能正在运行，是无法直接覆盖的。参考代码[HotfixModule.Load](https://github.com/leeveel/GeekServer/GeekServer.Core/Hotfix/HotfixModule.cs)
+需要注意的是，热更时新的dll需要放在新的目录下面，然后再载入内存，因为老的dll可能正在运行，是无法直接覆盖的。参考代码[HotfixModule.Load](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Core/Hotfix/HotfixModule.cs)
 #### 可以热更部分
 可以热更的逻辑都应该放在GeekServer.Hotfix工程中
 1. 所有Actor/Component的Agent，Agent中只有逻辑没有状态，状态全部放到Component的State

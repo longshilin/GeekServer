@@ -8,8 +8,8 @@ GeekServer网络层接入DotNetty，目前只支持tcp和http，GeekServer进行
 2. time：用于安全验证，当前utc时间tick（DateTime.UtcNow.Ticks），同时也做时间校验，客户端时间需要和服务器时间基本一致(超前/延后10秒左右)
 3. sign：用于安全验证，安全验证算法后的结果
 ###### 安全验证算法
-验证算法见[BaseHttpHandler](https://github.com/leeveel/GeekServer/GeekServer.Core/Net/Http/BaseHttpHandler.cs) GetStringSign函数
-sign = 算法函数(code + time)，其中sign和time在客户端发送到服务器的参数里面，code是[server_config.json](https://github.com/leeveel/GeekServer/GeekServer.App/Config/server_config.json) 中配置的HttpCode(非inner验证)/HttpInnerCode(inner验证) 
+验证算法见[BaseHttpHandler](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Core/Net/Http/BaseHttpHandler.cs) GetStringSign函数
+sign = 算法函数(code + time)，其中sign和time在客户端发送到服务器的参数里面，code是[server_config.json](https://github.com/leeveel/GeekServer/tree/master/GeekServer.App/Config/server_config.json) 中配置的HttpCode(非inner验证)/HttpInnerCode(inner验证) 
 注意，上线的商业项目记得修改HttpCode和HttpInnerCode，否则可能被他人利用。
 一般的，非Inner验证用于提供给第3放使用(运营/sdk。。。)，Inner验证用于内部游戏后台（发邮件，封号。。。）
 ```csharp
@@ -32,8 +32,8 @@ public class TestHttpHandler : BaseHttpHandler
 ### tcp
 GeekServer的tcp协议为自定义协议，区别于google的protocolBuffer和flatBuffer，但是序列化和反序列化都要优于2者。
 ###### tcp使用步骤
-1. 在[协议目录](https://github.com/leeveel/GeekServer/Tools/MessageGen/messages) 创建一个xml格式的协议文件。
-2. 运行MessageGen/msg.bat生成协议导[项目中](https://github.com/leeveel/GeekServer/GeekServer.Hotfix/Generate/Messages)
+1. 在[协议目录](https://github.com/leeveel/GeekServer/tree/master/Tools/MessageGen/messages) 创建一个xml格式的协议文件。
+2. 运行MessageGen/msg.bat生成协议导[项目中](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Hotfix/Generate/Messages)
 3. 创建任意脚本名字Handler，继承BaseTcpHandler/TcpActorHandler，使用TcpMsgMapping标记消息类型，实现ActionAsync函数即可,如果继承制TcpActorHandler还需实现CacheActor函数。BaseTcpHandler中的Msg即为解析好的当前类型协议数据
 ```csharp
 [TcpMsgMapping(typeof(Message.Sample.ReqTest))]
@@ -63,5 +63,5 @@ public class SampleTcpHandler : BaseTcpHandler
 8. 其他兼容限制（如果每次服务器和客户端同步升级可忽略此条）
 	字段只能添加，添加后不能删除，添加字段只能添加到最后，添加消息类型只能添加到最后
 	不能修改字段类型（如从bool改为long）
-9. 协议配置方法参考[Sample](https://github.com/leeveel/GeekServer/Tools/MessageGen/messages/Sample.xml)
+9. 协议配置方法参考[Sample](https://github.com/leeveel/GeekServer/tree/master/Tools/MessageGen/messages/Sample.xml)
 10. 根据项目需要可适当修改[协议生成模板](https://github.com/leeveel/GeekServer/Tools/MessageGen/template)
