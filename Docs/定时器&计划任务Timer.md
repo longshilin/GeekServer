@@ -1,4 +1,4 @@
-#定时器&计划任务
+# 定时器&计划任务
 GeekServer中没有使用传统意义中的Update，除MMO项目，其他大部分游戏类型的服务器基本没有必要使用Update，需要Update的模块添加一个Timer也可以实现
 根据热更新设计方案，定时器和计划任务采用接口方式进行回调，任务使用扩展方法实现，[源码参考](https://github.com/leeveel/GeekServer/GeekServer.Hotfix/Logic/Common/TimerExt.cs)
 定时器支持：1次性delay,周期性timer。

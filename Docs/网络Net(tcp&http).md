@@ -1,13 +1,13 @@
-#网络
+# 网络
 GeekServer网络层接入DotNetty，目前只支持tcp和http，GeekServer进行了深度包装，tcp和http都开发者来说用起来都非常简单。
 
-###http
+### http
 创建任意脚本名字Handler，继承BaseHttpHandler，使用HttpMsgMapping标记指令，实现Action函数即可使用。Action中调用或者实现对应指令的逻辑，并返回结果给客户端。此外httpHandler还有2个字段可以重写标示是否验证，CheckSign是否验证，Inner是否使用内部验证方式。GeekServer支持post和get方式访问。
-######特殊key不要占用
+###### 特殊key不要占用
 1. cmd：指令，自己定义的任意字符串
 2. time：用于安全验证，当前utc时间tick（DateTime.UtcNow.Ticks），同时也做时间校验，客户端时间需要和服务器时间基本一致(超前/延后10秒左右)
 3. sign：用于安全验证，安全验证算法后的结果
-######安全验证算法
+###### 安全验证算法
 验证算法见[BaseHttpHandler](https://github.com/leeveel/GeekServer/GeekServer.Core/Net/Http/BaseHttpHandler.cs) GetStringSign函数
 sign = 算法函数(code + time)，其中sign和time在客户端发送到服务器的参数里面，code是[server_config.json](https://github.com/leeveel/GeekServer/GeekServer.App/Config/server_config.json) 中配置的HttpCode(非inner验证)/HttpInnerCode(inner验证) 
 注意，上线的商业项目记得修改HttpCode和HttpInnerCode，否则可能被他人利用。
@@ -29,9 +29,9 @@ public class TestHttpHandler : BaseHttpHandler
 }
 ```
 
-###tcp
+### tcp
 GeekServer的tcp协议为自定义协议，区别于google的protocolBuffer和flatBuffer，但是序列化和反序列化都要优于2者。
-######tcp使用步骤
+###### tcp使用步骤
 1. 在[协议目录](https://github.com/leeveel/GeekServer/Tools/MessageGen/messages) 创建一个xml格式的协议文件。
 2. 运行MessageGen/msg.bat生成协议导[项目中](https://github.com/leeveel/GeekServer/GeekServer.Hotfix/Generate/Messages)
 3. 创建任意脚本名字Handler，继承BaseTcpHandler/TcpActorHandler，使用TcpMsgMapping标记消息类型，实现ActionAsync函数即可,如果继承制TcpActorHandler还需实现CacheActor函数。BaseTcpHandler中的Msg即为解析好的当前类型协议数据
@@ -48,7 +48,7 @@ public class SampleTcpHandler : BaseTcpHandler
 }
 ```
 
-######tcp协议
+###### tcp协议
 1. 使用模板代码自动生成，类似protocolBuffer，生成后的代码不能修改
 2. 分为结构和消息，消息相对结构多1个msgId；一般的，消息和结构可包含结构，消息和结构不可包含消息
 3. 协议支持的数据结构：int,long,bool,string,short,float,double,byte[],list,map,任意自定义结构
