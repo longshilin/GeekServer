@@ -30,17 +30,25 @@ Actor模型本身是存在死锁的情况，且不容易被发现，GeekServer�
 ### 11.一键导表工具  
 GeekServer包含一个一键导表工具，将策划配置表，转化为二进制数据，并提供了方便快捷的API供游戏调用   
 
-
 # 运行
 1. 安装[.NetCore3.1](https://dotnet.microsoft.com/download/dotnet/3.1)
-2. 在本机安装[mongodb](https://www.mongodb.com/try/download/community)
+2. 安装[mongodb4.x](https://www.mongodb.com/try/download/community)
 3. 打开git clone本项目https://github.com/leeveel/GeekServer.git
 4. 运行Tools/ExcelGen/ExcelConverter.exe 点击[服务器-ALL]导出配置表
 5. 用VisualStudio2019打开GeekServer.sln 启动GeekServer.App
 
-# ROADMAP  
-1. 文档以及Samples完善 
-2. 网络层支持UDP   
+# 文档&例子
+[文档](https://github.com/leeveel/GeekServer/Docs)
+[Sample](https://github.com/leeveel/GeekServer/GeekServer.Hotfix/Sample)
+
+# RoadMap
+【说明】当前版本已可满足开发，只是相对自由度较大
+更多通用功能集成到框架
+文档以及Samples完善
+和Unity交互Demo
+网络层支持UDP
+
+
 # 推荐项目  
 [xbuffer](https://github.com/CodeZeg/xbuffer) 一种简化版本的 flatbuffer 序列化库  
 [ExcelToCode](https://github.com/leeveel/ExcelToCode) 一键从Excel中导出模板代码和二进制数据  
