@@ -38,16 +38,15 @@ GeekServer包含一个一键导表工具，将策划配置表，转化为二进�
 5. 用VisualStudio2019打开GeekServer.sln 启动GeekServer.App
 
 # 文档&例子
-[文档](https://github.com/leeveel/GeekServer/tree/master/Docs)
+[文档](https://github.com/leeveel/GeekServer/tree/master/Docs)  
 [Sample](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Hotfix/Sample)
 
 # RoadMap
-【说明】当前版本已可满足开发，只是相对自由度较大
-更多通用功能集成到框架
-文档以及Samples完善
-和Unity交互Demo
-网络层支持UDP
-
+【说明】当前版本已可满足开发，只是相对自由度较大  
+更多通用功能集成到框架  
+文档以及Samples完善  
+和Unity交互Demo  
+网络层支持UDP  
 
 # 推荐项目  
 [xbuffer](https://github.com/CodeZeg/xbuffer) 一种简化版本的 flatbuffer 序列化库  
