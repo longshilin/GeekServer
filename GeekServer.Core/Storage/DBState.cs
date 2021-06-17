@@ -7,20 +7,37 @@ namespace Geek.Server
 {
     public abstract class DBState : InnerDBState
     {
-        ///<summary>mongodbId=actorId</summary>
-        public long _id;
+        ///<summary>mongodbId=actorId<para/>
+        ///需要注意mongodb不区分_id/id/Id/ID
+        ///</summary>
+        public long Id { get; set; }
+    }
+
+    //https://github.com/Fody/PropertyChanged/wiki/EventInvokerSelectionInjection
+    public abstract class InnerDBState : BaseState, INotifyPropertyChanged
+    {
+        /// <summary>PropertyChanged需要，勿动，保持为null即可</summary>
+        public event PropertyChangedEventHandler PropertyChanged;
+        public virtual void OnPropertyChanged(string propertyName)
+        {
+            _stateChanged = true;
+            var evt = PropertyChanged;
+            if (evt != null)
+                evt.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
         List<BaseState> bsList = new List<BaseState>();
-        public DBState()
+        public InnerDBState()
         {
-            //TODO 改成生成dll时注入
-            var arr = GetType().GetProperties(System.Reflection.BindingFlags.Public 
-                | System.Reflection.BindingFlags.Instance 
+            //待优化 改成生成dll时注入
+            var arr = GetType().GetProperties(System.Reflection.BindingFlags.Public
+                | System.Reflection.BindingFlags.Instance
                 | (System.Reflection.BindingFlags.SetProperty & System.Reflection.BindingFlags.SetProperty));
 
             foreach (var p in arr)
             {
-                if(p.PropertyType.IsSubclassOf(typeof(BaseState)))
+                if (p.PropertyType.IsSubclassOf(typeof(BaseState)))
                 {
                     var bs = (BaseState)p.GetValue(this);
                     bsList.Add(bs);
@@ -34,7 +51,7 @@ namespace Geek.Server
             {
                 if (_stateChanged)
                     return _stateChanged;
-                foreach(var bs in bsList)
+                foreach (var bs in bsList)
                 {
                     if (bs.IsChanged)
                         return true;
@@ -49,20 +66,6 @@ namespace Geek.Server
             _stateChanged = false;
             foreach (var bs in bsList)
                 bs.ClearChanges();
-        }
-    }
-
-    //https://github.com/Fody/PropertyChanged/wiki/EventInvokerSelectionInjection
-    public abstract class InnerDBState : BaseState, INotifyPropertyChanged
-    {
-        /// <summary>PropertyChanged需要，勿动，保持为null即可</summary>
-        public event PropertyChangedEventHandler PropertyChanged;
-        public virtual void OnPropertyChanged(string propertyName)
-        {
-            _stateChanged = true;
-            var evt = PropertyChanged;
-            if (evt != null)
-                evt.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 

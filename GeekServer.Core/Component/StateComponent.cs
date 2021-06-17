@@ -87,8 +87,8 @@ namespace Geek.Server
             await ReadStateAsync();
 
             StateComponent.AddShutdownSaveFunc(saveAllStateOfAType, timerSaveAllStateOfAType);
-            aTypeAllStateMap.TryRemove(_State._id, out _);
-            aTypeAllStateMap.TryAdd(_State._id, _State);
+            aTypeAllStateMap.TryRemove(_State.Id, out _);
+            aTypeAllStateMap.TryAdd(_State.Id, _State);
         }
 
         static readonly ConcurrentDictionary<long, TState> aTypeAllStateMap = new ConcurrentDictionary<long, TState>();
@@ -99,7 +99,7 @@ namespace Geek.Server
             foreach (var kv in aTypeAllStateMap)
             {
                 var state = kv.Value;
-                var actor = await ActorManager.Get<ComponentActor>(state._id);
+                var actor = await ActorManager.Get<ComponentActor>(state.Id);
                 if (actor == null || actor.ReadOnly)
                     continue;
 
@@ -109,7 +109,7 @@ namespace Geek.Server
                     continue;
 
                 state.ReadyToSaveToDB();
-                var filter = Builders<TState>.Filter.Eq(MongoField.UniqueId, state._id);
+                var filter = Builders<TState>.Filter.Eq(MongoField.Id, state.Id);
                 var saveModel = new ReplaceOneModel<TState>(filter, state) { IsUpsert = true };
                 batchList.Add(saveModel);
             }
@@ -159,11 +159,11 @@ namespace Geek.Server
             foreach (var kv in aTypeAllStateMap)
             {
                 var state = kv.Value;
-                var actor = await ActorManager.Get<ComponentActor>(state._id);
+                var actor = await ActorManager.Get<ComponentActor>(state.Id);
                 if (actor == null || actor.ReadOnly)
                     continue;
 
-                var filter = Builders<BsonDocument>.Filter.Eq(MongoField.UniqueId, state._id);
+                var filter = Builders<BsonDocument>.Filter.Eq(MongoField.Id, state.Id);
                 var task = actor.SendAsync(() => {
                     state.UpdateChangeVersion();
                     if (!state.IsChangedRefDB())
@@ -173,7 +173,7 @@ namespace Geek.Server
                     state.ReadyToSaveToDB();
                     var saveModel = new ReplaceOneModel<BsonDocument>(filter, bson) { IsUpsert = true };
                     batchQueue.Enqueue(saveModel);
-                    changedStateIdEuque.Enqueue(state._id);
+                    changedStateIdEuque.Enqueue(state.Id);
 
                 });
                 taskList.Add(task);
@@ -201,7 +201,7 @@ namespace Geek.Server
                         aTypeAllStateMap.TryGetValue(id, out var state);
                         if (state == null)
                             continue;
-                        var actor = await ActorManager.Get<ComponentActor>(state._id);
+                        var actor = await ActorManager.Get<ComponentActor>(state.Id);
                         _ = actor.SendAsync(() => {
                             state.SavedToDB();
                         });
@@ -239,7 +239,7 @@ namespace Geek.Server
         /// </summary>
         public override Task Deactive()
         {
-            aTypeAllStateMap.TryRemove(_State._id, out _);
+            aTypeAllStateMap.TryRemove(_State.Id, out _);
             return base.Deactive();
         }
 

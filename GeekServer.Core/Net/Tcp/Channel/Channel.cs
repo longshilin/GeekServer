@@ -22,7 +22,7 @@ namespace Geek.Server
         public IChannelHandlerContext Ctx { set; get; }
 
         /// <summary>
-        /// 连接标示，避免自己顶自己的号,客户端每次启动游戏生成一次
+        /// 连接标示，避免自己顶自己的号,客户端每次启动游戏生成一次/或者每个设备一个
         /// </summary>
         public string Sign { get; set; }
 
