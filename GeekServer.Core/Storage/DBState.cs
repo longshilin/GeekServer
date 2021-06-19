@@ -27,7 +27,7 @@ namespace Geek.Server
         }
 
 
-        List<BaseState> bsList = new List<BaseState>();
+        List<System.Reflection.PropertyInfo> bsList = new List<System.Reflection.PropertyInfo>();
         public InnerDBState()
         {
             //待优化 改成生成dll时注入
@@ -38,10 +38,7 @@ namespace Geek.Server
             foreach (var p in arr)
             {
                 if (p.PropertyType.IsSubclassOf(typeof(BaseState)))
-                {
-                    var bs = (BaseState)p.GetValue(this);
-                    bsList.Add(bs);
-                }
+                    bsList.Add(p);
             }
         }
 
@@ -53,7 +50,8 @@ namespace Geek.Server
                     return _stateChanged;
                 foreach (var bs in bsList)
                 {
-                    if (bs.IsChanged)
+                    var s = bs.GetValue(this) as BaseState;
+                    if (s != null && s.IsChanged)
                         return true;
                 }
                 return false;
@@ -65,7 +63,11 @@ namespace Geek.Server
             //base.ClearChanges();
             _stateChanged = false;
             foreach (var bs in bsList)
-                bs.ClearChanges();
+            {
+                var s = bs.GetValue(this) as BaseState;
+                if (s != null)
+                    s.ClearChanges();
+            }
         }
     }
 
