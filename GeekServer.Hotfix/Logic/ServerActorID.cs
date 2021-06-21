@@ -4,6 +4,7 @@ namespace Geek.Server
     public enum ActorType
     {
         Normal = 1,
+        Login,
         Rank,
         Test,
     }

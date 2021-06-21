@@ -9,6 +9,21 @@ namespace Geek.Server.Message
 		{
 			switch(msgId)
 			{
+				//背包
+				case 112001: return new Geek.Server.Message.DemoBag.ReqBagInfo();
+				case 112002: return new Geek.Server.Message.DemoBag.ResBagInfo();
+				case 112003: return new Geek.Server.Message.DemoBag.ReqUseItem();
+				case 112004: return new Geek.Server.Message.DemoBag.ReqSellItem();
+				case 112005: return new Geek.Server.Message.DemoBag.ResItemChange();
+				
+				//登陆
+				case 111001: return new Geek.Server.Message.DemoLogin.ReqLogin();
+				case 111002: return new Geek.Server.Message.DemoLogin.ResLogin();
+				case 111003: return new Geek.Server.Message.DemoLogin.ResLevelUp();
+				case 111004: return new Geek.Server.Message.DemoLogin.ResNotice();
+				case 111005: return new Geek.Server.Message.DemoLogin.ReqChangeName();
+				case 111006: return new Geek.Server.Message.DemoLogin.ResChangeName();
+				
 				//玩家快照
 				case 101201: return new Geek.Server.Message.Login.ReqLogin();
 				case 101202: return new Geek.Server.Message.Login.ReqReLogin();

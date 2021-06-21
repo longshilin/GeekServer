@@ -49,12 +49,14 @@ namespace Geek.Server.Config
         t_testContainer t_testContainer = new t_testContainer();
         t_test2Container t_test2Container = new t_test2Container();
         t_languageContainer t_languageContainer = new t_languageContainer();
+        t_itemContainer t_itemContainer = new t_itemContainer();
 		//@%@%@
 		private GameDataManager()
 		{
 			t_containerMap.Add(t_testContainer.BinType, t_testContainer);
 			t_containerMap.Add(t_test2Container.BinType, t_test2Container);
 			t_containerMap.Add(t_languageContainer.BinType, t_languageContainer);
+			t_containerMap.Add(t_itemContainer.BinType, t_itemContainer);
 			//@#@#@
 		}
 		
@@ -63,6 +65,7 @@ namespace Geek.Server.Config
 			LoadOneBean(t_testContainer.BinType, forceReload);
 			LoadOneBean(t_test2Container.BinType, forceReload);
 			LoadOneBean(t_languageContainer.BinType, forceReload);
+			LoadOneBean(t_itemContainer.BinType, forceReload);
 			//@*@*@
 		}
 		
