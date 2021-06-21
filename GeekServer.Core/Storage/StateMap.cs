@@ -32,6 +32,8 @@ namespace Geek.Server
                 {
                     foreach (var item in map)
                     {
+                        if (item.Key == null)
+                            continue;
                         if ((item.Key as BaseState).IsChanged)
                             return true;
                     }
@@ -41,6 +43,8 @@ namespace Geek.Server
                 {
                     foreach (var item in map)
                     {
+                        if (item.Value == null)
+                            continue;
                         if ((item.Value as BaseState).IsChanged)
                             return true;
                     }
@@ -53,6 +57,27 @@ namespace Geek.Server
         public override void ClearChanges()
         {
             _stateChanged = false;
+            if (typeof(TKey).IsSubclassOf(typeof(BaseState)))
+            {
+                foreach (var item in map)
+                {
+                    if (item.Key == null)
+                        continue;
+                    if (item.Key is BaseState bs)
+                        bs.ClearChanges();
+                }
+            }
+
+            if (typeof(TValue).IsSubclassOf(typeof(BaseState)))
+            {
+                foreach (var item in map)
+                {
+                    if (item.Value == null)
+                        continue;
+                    if (item.Value is BaseState bs)
+                        bs.ClearChanges();
+                }
+            }
         }
 
         public bool ContainsKey(TKey key)

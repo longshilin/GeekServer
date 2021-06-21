@@ -27,6 +27,8 @@ namespace Geek.Server
                 {
                     foreach(var item in list)
                     {
+                        if (item == null)
+                            continue;
                         if ((item as BaseState).IsChanged)
                             return true;
                     }
@@ -38,6 +40,16 @@ namespace Geek.Server
         public override void ClearChanges()
         {
             _stateChanged = false;
+            if (typeof(T).IsSubclassOf(typeof(BaseState)))
+            {
+                foreach (var item in list)
+                {
+                    if (item == null)
+                        continue;
+                    if (item is BaseState bs)
+                        bs.ClearChanges();
+                }
+            }
         }
 
         public T this[int index]
