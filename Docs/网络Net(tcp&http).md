@@ -65,3 +65,4 @@ public class SampleTcpHandler : BaseTcpHandler
 	不能修改字段类型（如从bool改为long）
 9. 协议配置方法参考[Sample](https://github.com/leeveel/GeekServer/tree/master/Tools/MessageGen/messages/Sample.xml)
 10. 根据项目需要可适当修改[协议生成模板](https://github.com/leeveel/GeekServer/Tools/MessageGen/template)
+11. 已有线上项目验证支持ILRunTime热更。如果客户端没有使用C#，需要自行书写模板/模板工具，模板工具使用[Scriban](https://github.com/scriban/scriban) 开发
