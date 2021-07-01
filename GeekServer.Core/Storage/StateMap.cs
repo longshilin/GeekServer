@@ -200,5 +200,15 @@ namespace Geek.Server
         {
             return ((IEnumerable)map).GetEnumerator();
         }
+
+        public static implicit operator StateMap<TKey, TValue>(Dictionary<TKey, TValue> dic)
+        {
+            return new StateMap<TKey, TValue>(dic);
+        }
+
+        public static implicit operator Dictionary<TKey, TValue>(StateMap<TKey, TValue> map)
+        {
+            return map.map;
+        }
     }
 }

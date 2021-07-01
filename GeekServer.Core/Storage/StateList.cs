@@ -92,6 +92,26 @@ namespace Geek.Server
             return list.Find(predicate);
         }
 
+        public List<T> FindAll(Predicate<T> match)
+        {
+            return list.FindAll(match);
+        }
+
+        public int FindIndex(int startIndex, int count, Predicate<T> match)
+        {
+            return list.FindIndex(startIndex, count, match);
+        }
+
+        public int FindIndex(int startIndex, Predicate<T> match)
+        {
+            return list.FindIndex(startIndex, match);
+        }
+
+        public int FindIndex(Predicate<T> match)
+        {
+            return list.FindIndex(match);
+        }
+
         public void ForEach(Action<T> action)
         {
             list.ForEach(action);
@@ -142,8 +162,20 @@ namespace Geek.Server
                 _stateChanged = true;
                 return true;
             }
-
             return false;
+        }
+
+        public int RemoveAll(Predicate<T> match)
+        {
+            int removedNum = list.RemoveAll(match);
+            if (removedNum > 0)
+                _stateChanged = true;
+            return removedNum;
+        }
+
+        public bool Exists(Predicate<T> match)
+        {
+            return list.Exists(match);
         }
 
         public int Count
