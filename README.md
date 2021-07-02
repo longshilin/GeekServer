@@ -40,7 +40,8 @@ GeekServer包含一个一键导表工具，将策划配置表，转化为二进�
 # 文档&例子&Demo
 [文档](https://github.com/leeveel/GeekServer/tree/master/Docs)  
 [Sample](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Hotfix/Sample)  
-[UnityDemo_Client](https://github.com/leeveel/GeekServer/tree/master/UnityDemo)[测试版本Unity2019.x，测试平台Android]  [UnityDemo_Server](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Hotfix/Demo)
+[UnityDemo_Server](https://github.com/leeveel/GeekServer/tree/master/GeekServer.Hotfix/Demo)  
+[UnityDemo_Client](https://github.com/leeveel/GeekServer/tree/master/UnityDemo)[测试版本Unity2019.x，测试平台Android]Client代码未做任何优化和设计，仅用于演示如何与服务器交互  
 
 # 推荐项目  
 [xbuffer](https://github.com/CodeZeg/xbuffer) 一种简化版本的 flatbuffer 序列化库  
