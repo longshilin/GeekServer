@@ -5,12 +5,24 @@ namespace Geek.Server
 {
     public abstract class WorkWrapper
     {
-        public ActorNode Node { get; set; }
         public BaseActor Owner { get; set; }
         public int TimeOut { get; set; }
         public abstract Task DoTask();
         public abstract string GetTrace();
         public abstract void ForceSetResult();
+        public long CallChainId { get; set; }
+        protected void SetContext()
+        {
+            lock (Owner.Lockable)
+            {
+                RuntimeContext.SetContext(CallChainId);
+                Owner.curCallChainId = CallChainId;
+            }
+        }
+        public void ResetContext()
+        {
+            BaseActor.WaitingMap.TryRemove(CallChainId, out _);
+        }
     }
 
     public class ActionWrapper : WorkWrapper
@@ -28,11 +40,9 @@ namespace Geek.Server
 
         public override Task DoTask()
         {
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(Node);
-
             try
             {
+                SetContext();
                 Work();
             }
             catch (Exception e)
@@ -42,10 +52,8 @@ namespace Geek.Server
             finally
             {
                 Tcs.TrySetResult(true);
+                ResetContext();
             }
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(null);
-
             return Task.CompletedTask;
         }
 
@@ -57,6 +65,7 @@ namespace Geek.Server
         public override void ForceSetResult()
         {
             Tcs.TrySetResult(false);
+            ResetContext();
         }
     }
 
@@ -75,12 +84,10 @@ namespace Geek.Server
 
         public override Task DoTask()
         {
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(Node);
-
             T ret = default;
             try
             {
+                SetContext();
                 ret = Work();
             }
             catch (Exception e)
@@ -90,11 +97,8 @@ namespace Geek.Server
             finally
             {
                 Tcs.TrySetResult(ret);
+                ResetContext();
             }
-
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(null);
-
             return Task.CompletedTask;
         }
 
@@ -106,6 +110,7 @@ namespace Geek.Server
         public override void ForceSetResult()
         {
             Tcs.TrySetResult(default);
+            ResetContext();
         }
     }
 
@@ -124,11 +129,9 @@ namespace Geek.Server
 
         public override async Task DoTask()
         {
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(Node);
-
             try
             {
+                SetContext();
                 await Work();
             }
             catch (Exception e)
@@ -138,9 +141,8 @@ namespace Geek.Server
             finally
             {
                 Tcs.TrySetResult(true);
+                ResetContext();
             }
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(null);
         }
 
         public override string GetTrace()
@@ -151,6 +153,7 @@ namespace Geek.Server
         public override void ForceSetResult()
         {
             Tcs.TrySetResult(false);
+            ResetContext();
         }
     }
 
@@ -169,12 +172,10 @@ namespace Geek.Server
 
         public override async Task DoTask()
         {
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(Node);
-
             T ret = default;
             try
             {
+                SetContext();
                 ret = await Work();
             }
             catch (Exception e)
@@ -184,10 +185,8 @@ namespace Geek.Server
             finally
             {
                 Tcs.TrySetResult(ret);
+                ResetContext();
             }
-
-            if (Settings.Ins.IsDebug)
-                Node.Actor.SetActiveNode(null);
         }
 
         public override string GetTrace()
@@ -198,6 +197,7 @@ namespace Geek.Server
         public override void ForceSetResult()
         {
             Tcs.TrySetResult(default);
+            ResetContext();
         }
     }
 }
