@@ -422,6 +422,7 @@ MonoBehaviour:
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
+  m_ShouldActivateOnSelect: 1
 --- !u!114 &401860113
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -551,7 +552,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 607384290}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: beee9fcca27a43e4daf9c576ce3e78bc, type: 3}
+  m_Script: {fileID: 11500000, guid: db4ecff9792656b459d416e56e48244c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &607384292
@@ -610,7 +611,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 642137450}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb1cb9564add2ce43af32ba5a4b2c5d5, type: 3}
+  m_Script: {fileID: 11500000, guid: 7f79108ec9906794da186c5da3976e9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ipTxt: {fileID: 1331556034}
@@ -763,7 +764,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 1
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: localhost:10000
+  m_Text: localhost:10001
 --- !u!222 &691601566
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1028,10 +1029,11 @@ MonoBehaviour:
   m_CaretColor: {r: 0.19607843, g: 0.19607843, b: 0.19607843, a: 1}
   m_CustomCaretColor: 0
   m_SelectionColor: {r: 0.65882355, g: 0.80784315, b: 1, a: 0.7529412}
-  m_Text: localhost:10000
+  m_Text: localhost:10001
   m_CaretBlinkRate: 0.85
   m_CaretWidth: 1
   m_ReadOnly: 0
+  m_ShouldActivateOnSelect: 1
 --- !u!114 &1331556035
 MonoBehaviour:
   m_ObjectHideFlags: 0

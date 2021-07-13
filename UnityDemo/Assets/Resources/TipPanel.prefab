@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2564692760530916305}
   - component: {fileID: 2248710499154796705}
   m_Layer: 5
-  m_Name: TipCanvas
+  m_Name: TipPanel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -109,7 +109,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2564692760530916304}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 49a4b08f4900cfa46a32f929885f3c94, type: 3}
+  m_Script: {fileID: 11500000, guid: 90e1eef02b6f19044aedf3b62902f7a6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   TipTxt: {fileID: 2564692760878010673}

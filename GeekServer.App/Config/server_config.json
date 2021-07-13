@@ -13,7 +13,7 @@
 	"HttpUrl": "/geek/server/logic",
 	"HttpPort": 20000,
 
-	"TcpPort": 10000,
+	"TcpPort": 10001,
 	"UseLibuv": true,
 
 	"MongoDB": "geek_game",

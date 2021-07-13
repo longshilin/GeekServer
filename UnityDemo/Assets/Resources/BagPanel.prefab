@@ -1305,13 +1305,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 7990878866510080950}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 303871028b8a4554aab4d9c3e92a39b4, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b1cb8b908ad5bc42b0705bdc5b00737, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   GoldTxt: {fileID: 9205531372509482603}
   CloseBtn: {fileID: 1833203849732701458}
-  ItemTemplate: {fileID: 7990878865507347879}
-  ItemContainer: {fileID: 7990878865956999525}
+  ItemTemplate: {fileID: 2382920180395744635, guid: b22a6663386958f41beffc548e0b0f31,
+    type: 3}
+  ItemContainer: {fileID: 7990878865279445074}
 --- !u!1 &7990878866814513503
 GameObject:
   m_ObjectHideFlags: 0
