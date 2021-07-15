@@ -43,26 +43,19 @@ namespace Geek.Server
             }
         }
 
-        private void IsNeedEqueue(bool allowCallChainReentrancy, out bool needEqueue, out long callChainId)
+        private void IsNeedEnqueue(out bool needEnqueue, out long callChainId)
         {
             lock (Lockable)
             {
                 callChainId = RuntimeContext.Current;
-                if (!allowCallChainReentrancy)
-                {
-                    callChainId = Interlocked.Increment(ref idCounter);
-                    needEqueue = true;
-                    return;
-                }
-
                 if (callChainId <= 0)
                 {
                     callChainId = Interlocked.Increment(ref idCounter);
-                    needEqueue = true;
+                    needEnqueue = true;
                 }
                 else if (callChainId == curCallChainId)
                 {
-                    needEqueue = false;
+                    needEnqueue = false;
                     return;
                 }
 
@@ -71,25 +64,36 @@ namespace Geek.Server
                     WaitingMap.TryGetValue(curCallChainId, out var waiting);
                     if (waiting != null && waiting.curCallChainId == callChainId)
                     {
-                        needEqueue = false;
+                        needEnqueue = false;
                     }
                     else
                     {
                         WaitingMap[callChainId] = this;
-                        needEqueue = true;
+                        needEnqueue = true;
                     }
                 }
                 else
                 {
-                    needEqueue = true;
+                    needEnqueue = true;
                 }
             }
         }
 
-        public Task SendAsync(Action work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task SendAsync(Action work, bool forceEnqueue = false, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (forceEnqueue)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            IsNeedEnqueue(out needEnqueue, out callChainId);
+            if (needEnqueue)
             {
                 ActionWrapper at = new ActionWrapper(work);
                 at.Owner = this;
@@ -105,10 +109,21 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<T> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<T> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (forceEnqueue)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            IsNeedEnqueue(out needEnqueue, out callChainId);
+            if (needEnqueue)
             {
                 FuncWrapper<T> at = new FuncWrapper<T>(work);
                 at.Owner = this;
@@ -123,10 +138,21 @@ namespace Geek.Server
             }
         }
 
-        public Task SendAsync(Func<Task> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task SendAsync(Func<Task> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (forceEnqueue)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            IsNeedEnqueue(out needEnqueue, out callChainId);
+            if (needEnqueue)
             {
                 ActionAsyncWrapper at = new ActionAsyncWrapper(work);
                 at.Owner = this;
@@ -141,10 +167,21 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<Task<T>> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<Task<T>> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (forceEnqueue)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            IsNeedEnqueue(out needEnqueue, out callChainId);
+            if (needEnqueue)
             {
                 FuncAsyncWrapper<T> at = new FuncAsyncWrapper<T>(work);
                 at.Owner = this;

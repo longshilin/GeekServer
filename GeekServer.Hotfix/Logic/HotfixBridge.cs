@@ -30,7 +30,7 @@ namespace Geek.Server
                     LOGGER.Info("清除缓存的agent...");
                     await ActorManager.ActorsForeach((actor) =>
                     {
-                        actor.SendAsync(actor.ClearCacheAgent, false);
+                        actor.SendAsync(actor.ClearCacheAgent, true);
                         return Task.CompletedTask;
                     });
                     LOGGER.Info("hotfix load success");
