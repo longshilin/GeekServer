@@ -8,10 +8,14 @@ namespace Geek.Server
 {
     public abstract class BaseActor
     {
+        public class Setting
+        {
+            public static bool CheckDeadlock = true;
+        }
         readonly static NLog.Logger LOGGER = NLog.LogManager.GetCurrentClassLogger();
         public const int TIME_OUT = 10000;
 
-        public object Lockable = new object();
+        public static object Lockable = new object();
         /// <summary>
         /// 调用链 ---  正在等待的ActorId
         /// </summary>
@@ -45,36 +49,37 @@ namespace Geek.Server
 
         private void IsNeedEnqueue(out bool needEnqueue, out long callChainId)
         {
-            lock (Lockable)
+            callChainId = RuntimeContext.Current;
+            if (callChainId <= 0)
             {
-                callChainId = RuntimeContext.Current;
-                if (callChainId <= 0)
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+                return;
+            }
+            else if (callChainId == curCallChainId)
+            {
+                needEnqueue = false;
+                return;
+            }
+            needEnqueue = true;
+            if (Setting.CheckDeadlock)
+            {
+                long curChainId = Volatile.Read(ref curCallChainId);
+                if (curChainId > 0)
                 {
-                    callChainId = Interlocked.Increment(ref idCounter);
-                    needEnqueue = true;
-                }
-                else if (callChainId == curCallChainId)
-                {
-                    needEnqueue = false;
-                    return;
-                }
-
-                if (curCallChainId > 0)
-                {
-                    WaitingMap.TryGetValue(curCallChainId, out var waiting);
-                    if (waiting != null && waiting.curCallChainId == callChainId)
+                    lock (Lockable)
                     {
-                        needEnqueue = false;
+                        WaitingMap.TryGetValue(curChainId, out var waiting);
+                        //Console.WriteLine($"curCallChainId:{curCallChainId} waitingCallChainId:{waiting?.curCallChainId}");
+                        if (waiting != null && Volatile.Read(ref waiting.curCallChainId) == callChainId)
+                        {
+                            throw new DeadlockException("multipath dead lock");
+                        }
+                        else
+                        {
+                            WaitingMap[callChainId] = this;
+                        }
                     }
-                    else
-                    {
-                        WaitingMap[callChainId] = this;
-                        needEnqueue = true;
-                    }
-                }
-                else
-                {
-                    needEnqueue = true;
                 }
             }
         }
@@ -92,7 +97,6 @@ namespace Geek.Server
             {
                 IsNeedEnqueue(out needEnqueue, out callChainId);
             }
-            IsNeedEnqueue(out needEnqueue, out callChainId);
             if (needEnqueue)
             {
                 ActionWrapper at = new ActionWrapper(work);
@@ -122,7 +126,6 @@ namespace Geek.Server
             {
                 IsNeedEnqueue(out needEnqueue, out callChainId);
             }
-            IsNeedEnqueue(out needEnqueue, out callChainId);
             if (needEnqueue)
             {
                 FuncWrapper<T> at = new FuncWrapper<T>(work);
@@ -151,7 +154,6 @@ namespace Geek.Server
             {
                 IsNeedEnqueue(out needEnqueue, out callChainId);
             }
-            IsNeedEnqueue(out needEnqueue, out callChainId);
             if (needEnqueue)
             {
                 ActionAsyncWrapper at = new ActionAsyncWrapper(work);
@@ -180,7 +182,6 @@ namespace Geek.Server
             {
                 IsNeedEnqueue(out needEnqueue, out callChainId);
             }
-            IsNeedEnqueue(out needEnqueue, out callChainId);
             if (needEnqueue)
             {
                 FuncAsyncWrapper<T> at = new FuncAsyncWrapper<T>(work);

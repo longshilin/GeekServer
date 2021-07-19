@@ -13,11 +13,8 @@ namespace Geek.Server
         public long CallChainId { get; set; }
         protected void SetContext()
         {
-            lock (Owner.Lockable)
-            {
-                RuntimeContext.SetContext(CallChainId);
-                Owner.curCallChainId = CallChainId;
-            }
+            RuntimeContext.SetContext(CallChainId);
+            Owner.curCallChainId = CallChainId;
         }
         public void ResetContext()
         {
