@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -8,10 +9,6 @@ namespace Geek.Server
 {
     public abstract class BaseActor
     {
-        public class Setting
-        {
-            public static bool CheckDeadlock = true;
-        }
         readonly static NLog.Logger LOGGER = NLog.LogManager.GetCurrentClassLogger();
         public const int TIME_OUT = 10000;
 
@@ -25,7 +22,10 @@ namespace Geek.Server
         /// </summary>
         internal long curCallChainId;   
         private static long idCounter = 1;
-
+        /// <summary>
+        /// 当前任务是否可以被交错执行
+        /// </summary>
+        public volatile bool CurCanBeInterleaved;
         public long ActorId { get; set; }
         public BaseActor(int parallelism = 1)
         {
@@ -47,7 +47,7 @@ namespace Geek.Server
             }
         }
 
-        private void IsNeedEnqueue(out bool needEnqueue, out long callChainId)
+        private void IsNeedEnqueue(MethodInfo method, out bool needEnqueue, out long callChainId)
         {
             callChainId = RuntimeContext.Current;
             if (callChainId <= 0)
@@ -62,23 +62,23 @@ namespace Geek.Server
                 return;
             }
             needEnqueue = true;
-            if (Setting.CheckDeadlock)
+            long curChainId = Volatile.Read(ref curCallChainId);
+            if (curChainId > 0)
             {
-                long curChainId = Volatile.Read(ref curCallChainId);
-                if (curChainId > 0)
+                lock (Lockable)
                 {
-                    lock (Lockable)
+                    WaitingMap.TryGetValue(curChainId, out var waiting);
+                    //Console.WriteLine($"curCallChainId:{curCallChainId} waitingCallChainId:{waiting?.curCallChainId}");
+                    if (waiting != null && Volatile.Read(ref waiting.curCallChainId) == callChainId)
                     {
-                        WaitingMap.TryGetValue(curChainId, out var waiting);
-                        //Console.WriteLine($"curCallChainId:{curCallChainId} waitingCallChainId:{waiting?.curCallChainId}");
-                        if (waiting != null && Volatile.Read(ref waiting.curCallChainId) == callChainId)
-                        {
-                            throw new DeadlockException("multipath dead lock");
-                        }
+                        if (CurCanBeInterleaved)
+                            needEnqueue = false;
                         else
-                        {
-                            WaitingMap[callChainId] = this;
-                        }
+                            throw new DeadlockException("multi call chain dead lock");
+                    }
+                    else
+                    {
+                        WaitingMap[callChainId] = this;
                     }
                 }
             }
@@ -95,7 +95,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(out needEnqueue, out callChainId);
+                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -124,7 +124,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(out needEnqueue, out callChainId);
+                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -152,7 +152,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(out needEnqueue, out callChainId);
+                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -180,7 +180,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(out needEnqueue, out callChainId);
+                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
