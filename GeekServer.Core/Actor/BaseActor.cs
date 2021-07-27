@@ -47,7 +47,7 @@ namespace Geek.Server
             }
         }
 
-        private void IsNeedEnqueue(MethodInfo method, out bool needEnqueue, out long callChainId)
+        private void IsNeedEnqueue(out bool needEnqueue, out long callChainId)
         {
             callChainId = RuntimeContext.Current;
             if (callChainId <= 0)
@@ -95,7 +95,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
+                IsNeedEnqueue(out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -124,7 +124,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
+                IsNeedEnqueue(out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -152,7 +152,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
+                IsNeedEnqueue(out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
@@ -180,7 +180,7 @@ namespace Geek.Server
             }
             else
             {
-                IsNeedEnqueue(work.Method, out needEnqueue, out callChainId);
+                IsNeedEnqueue(out needEnqueue, out callChainId);
             }
             if (needEnqueue)
             {
