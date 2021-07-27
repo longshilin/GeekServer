@@ -84,11 +84,18 @@ namespace Geek.Server
             }
         }
 
-        public Task SendAsync(Action work, bool forceEnqueue = false, int timeOut = TIME_OUT)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="work"></param>
+        /// <param name="isAwait">大部分情况下应该都需要等待的,如果调用者没有等待,则需要把work强制入队</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        public Task SendAsync(Action work, bool isAwait = true, int timeOut = TIME_OUT)
         {
             long callChainId;
             bool needEnqueue;
-            if (forceEnqueue)
+            if (!isAwait)
             {
                 callChainId = Interlocked.Increment(ref idCounter);
                 needEnqueue = true;
@@ -113,11 +120,11 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<T> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<T> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
             long callChainId;
             bool needEnqueue;
-            if (forceEnqueue)
+            if (!isAwait)
             {
                 callChainId = Interlocked.Increment(ref idCounter);
                 needEnqueue = true;
@@ -141,11 +148,11 @@ namespace Geek.Server
             }
         }
 
-        public Task SendAsync(Func<Task> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
+        public Task SendAsync(Func<Task> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
             long callChainId;
             bool needEnqueue;
-            if (forceEnqueue)
+            if (!isAwait)
             {
                 callChainId = Interlocked.Increment(ref idCounter);
                 needEnqueue = true;
@@ -169,11 +176,11 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<Task<T>> work, bool forceEnqueue = false, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<Task<T>> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
             long callChainId;
             bool needEnqueue;
-            if (forceEnqueue)
+            if (!isAwait)
             {
                 callChainId = Interlocked.Increment(ref idCounter);
                 needEnqueue = true;

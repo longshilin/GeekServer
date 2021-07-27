@@ -170,7 +170,7 @@ namespace Geek.Server
                         });
                     }
                     await actor.CheckIdle();
-                });
+                }, false);
             }
             return Task.CompletedTask;
         }

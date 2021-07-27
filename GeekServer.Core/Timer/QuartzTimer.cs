@@ -41,7 +41,7 @@ namespace Geek.Server
                     //actor
                     var agent = await ActorManager.GetOrNew(agentType, actorId);
                     var actor = (ComponentActor)agent.Owner;
-                    _ = actor.SendAsync(() => handler.InternalHandleTimer(agent, param), true);
+                    _ = actor.SendAsync(() => handler.InternalHandleTimer(agent, param), false);
                 }
                 else if (agentType.GetInterface(typeof(IComponentAgent).FullName) != null)
                 {
@@ -51,7 +51,7 @@ namespace Geek.Server
                     var agent = await ActorManager.GetOrNew(actorAgentType, actorId);
                     var actor = (ComponentActor)agent.Owner;
                     var comp = await actor.GetComponent(compType);
-                    _ = actor.SendAsync(() => handler.InternalHandleTimer(comp.GetAgent(agentType), param), true);
+                    _ = actor.SendAsync(() => handler.InternalHandleTimer(comp.GetAgent(agentType), param), false);
                 }
             }
             catch (Exception e)

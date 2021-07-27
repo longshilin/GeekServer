@@ -68,24 +68,24 @@ namespace Geek.Server
             return QuartzTimer.AddTimer(delay, period, ActorId, GetType().FullName, typeof(TH).FullName, param);
         }
 
-        public Task SendAsync(Action work, bool forceEnqueue = false, int timeOut = BaseActor.TIME_OUT)
+        public Task SendAsync(Action work, bool isAwait = true, int timeOut = BaseActor.TIME_OUT)
         {
-            return Actor.SendAsync(work, forceEnqueue, timeOut);
+            return Actor.SendAsync(work, isAwait, timeOut);
         }
 
-        public Task<TRet> SendAsync<TRet>(Func<TRet> work, bool forceEnqueue = false, int timeOut = BaseActor.TIME_OUT)
+        public Task<TRet> SendAsync<TRet>(Func<TRet> work, bool isAwait = true, int timeOut = BaseActor.TIME_OUT)
         {
-            return Actor.SendAsync(work, forceEnqueue, timeOut);
+            return Actor.SendAsync(work, isAwait, timeOut);
         }
 
-        public Task SendAsync(Func<Task> work, bool forceEnqueue = false, int timeOut = BaseActor.TIME_OUT)
+        public Task SendAsync(Func<Task> work, bool isAwait = true, int timeOut = BaseActor.TIME_OUT)
         {
-            return Actor.SendAsync(work, forceEnqueue, timeOut);
+            return Actor.SendAsync(work, isAwait, timeOut);
         }
 
-        public Task<TRet> SendAsync<TRet>(Func<Task<TRet>> work, bool forceEnqueue = false, int timeOut = BaseActor.TIME_OUT)
+        public Task<TRet> SendAsync<TRet>(Func<Task<TRet>> work, bool isAwait = true, int timeOut = BaseActor.TIME_OUT)
         {
-            return Actor.SendAsync(work, forceEnqueue, timeOut);
+            return Actor.SendAsync(work, isAwait, timeOut);
         }
     }
 }

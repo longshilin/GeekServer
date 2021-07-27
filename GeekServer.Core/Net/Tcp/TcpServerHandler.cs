@@ -35,9 +35,9 @@ namespace Geek.Server
                         if (actor != null)
                         {
                             if (actor is IChannel ise)
-                                _ = actor.SendAsync(ise.Hand);
+                                _ = actor.SendAsync(ise.Hand, false);
                             if (actor.TransformAgent<IChannel>(out var seAgent))
-                                _ = actor.SendAsync(seAgent.Hand);
+                                _ = actor.SendAsync(seAgent.Hand, false);
                         }
                     }
 

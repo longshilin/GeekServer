@@ -88,7 +88,7 @@ namespace Geek.Server
                 await Task.WhenAll(taskList);
 
                 var serverActor = await ActorManager.GetOrNew<ServerActorAgent>(ServerActorID.GetID(ActorType.Normal));
-                _ = serverActor.SendAsync(serverActor.CheckCrossDay);
+                _ = serverActor.SendAsync(serverActor.CheckCrossDay, false);
 
                 return true;
             }catch(Exception e)
