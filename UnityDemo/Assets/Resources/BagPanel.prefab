@@ -1310,9 +1310,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GoldTxt: {fileID: 9205531372509482603}
   CloseBtn: {fileID: 1833203849732701458}
-  ItemTemplate: {fileID: 2382920180395744635, guid: b22a6663386958f41beffc548e0b0f31,
-    type: 3}
-  ItemContainer: {fileID: 7990878865279445074}
+  ItemTemplate: {fileID: 7990878865507347879}
+  ItemContainer: {fileID: 7990878865956999525}
 --- !u!1 &7990878866814513503
 GameObject:
   m_ObjectHideFlags: 0
