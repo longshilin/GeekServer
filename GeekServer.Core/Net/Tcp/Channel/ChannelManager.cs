@@ -58,9 +58,9 @@ namespace Geek.Server
                 if (actor != null)
                 {
                     if (actor is IChannel chl)
-                        _ = actor.SendAsync(chl.OnDisconnect);
+                        _ = actor.SendAsync(chl.OnDisconnect, false);
                     if (actor.TransformAgent<IChannel>(out var chAgent))
-                        _ = actor.SendAsync(chAgent.OnDisconnect);
+                        _ = actor.SendAsync(chAgent.OnDisconnect, false);
                 }
             }
         }

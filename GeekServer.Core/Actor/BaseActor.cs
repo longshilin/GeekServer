@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -11,7 +12,7 @@ namespace Geek.Server
         readonly static NLog.Logger LOGGER = NLog.LogManager.GetCurrentClassLogger();
         public const int TIME_OUT = 10000;
 
-        public object Lockable = new object();
+        public static object Lockable = new object();
         /// <summary>
         /// 调用链 ---  正在等待的ActorId
         /// </summary>
@@ -21,7 +22,10 @@ namespace Geek.Server
         /// </summary>
         internal long curCallChainId;   
         private static long idCounter = 1;
-
+        /// <summary>
+        /// 当前任务是否可以被交错执行
+        /// </summary>
+        public volatile bool CurCanBeInterleaved;
         public long ActorId { get; set; }
         public BaseActor(int parallelism = 1)
         {
@@ -43,53 +47,64 @@ namespace Geek.Server
             }
         }
 
-        private void IsNeedEqueue(bool allowCallChainReentrancy, out bool needEqueue, out long callChainId)
+        private void IsNeedEnqueue(out bool needEnqueue, out long callChainId)
         {
-            lock (Lockable)
+            callChainId = RuntimeContext.Current;
+            if (callChainId <= 0)
             {
-                callChainId = RuntimeContext.Current;
-                if (!allowCallChainReentrancy)
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+                return;
+            }
+            else if (callChainId == curCallChainId)
+            {
+                needEnqueue = false;
+                return;
+            }
+            needEnqueue = true;
+            long curChainId = Volatile.Read(ref curCallChainId);
+            if (curChainId > 0)
+            {
+                lock (Lockable)
                 {
-                    callChainId = Interlocked.Increment(ref idCounter);
-                    needEqueue = true;
-                    return;
-                }
-
-                if (callChainId <= 0)
-                {
-                    callChainId = Interlocked.Increment(ref idCounter);
-                    needEqueue = true;
-                }
-                else if (callChainId == curCallChainId)
-                {
-                    needEqueue = false;
-                    return;
-                }
-
-                if (curCallChainId > 0)
-                {
-                    WaitingMap.TryGetValue(curCallChainId, out var waiting);
-                    if (waiting != null && waiting.curCallChainId == callChainId)
+                    WaitingMap.TryGetValue(curChainId, out var waiting);
+                    //Console.WriteLine($"curCallChainId:{curCallChainId} waitingCallChainId:{waiting?.curCallChainId}");
+                    if (waiting != null && Volatile.Read(ref waiting.curCallChainId) == callChainId)
                     {
-                        needEqueue = false;
+                        if (CurCanBeInterleaved)
+                            needEnqueue = false;
+                        else
+                            throw new DeadlockException("multi call chain dead lock");
                     }
                     else
                     {
                         WaitingMap[callChainId] = this;
-                        needEqueue = true;
                     }
-                }
-                else
-                {
-                    needEqueue = true;
                 }
             }
         }
 
-        public Task SendAsync(Action work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="work"></param>
+        /// <param name="isAwait">大部分情况下应该都需要等待的,如果调用者没有等待,则需要把work强制入队</param>
+        /// <param name="timeOut"></param>
+        /// <returns></returns>
+        public Task SendAsync(Action work, bool isAwait = true, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (!isAwait)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            if (needEnqueue)
             {
                 ActionWrapper at = new ActionWrapper(work);
                 at.Owner = this;
@@ -105,10 +120,20 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<T> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<T> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (!isAwait)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            if (needEnqueue)
             {
                 FuncWrapper<T> at = new FuncWrapper<T>(work);
                 at.Owner = this;
@@ -123,10 +148,20 @@ namespace Geek.Server
             }
         }
 
-        public Task SendAsync(Func<Task> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task SendAsync(Func<Task> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (!isAwait)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            if (needEnqueue)
             {
                 ActionAsyncWrapper at = new ActionAsyncWrapper(work);
                 at.Owner = this;
@@ -141,10 +176,20 @@ namespace Geek.Server
             }
         }
 
-        public Task<T> SendAsync<T>(Func<Task<T>> work, bool allowCallChainReentrancy = true, int timeOut = TIME_OUT)
+        public Task<T> SendAsync<T>(Func<Task<T>> work, bool isAwait = true, int timeOut = TIME_OUT)
         {
-            IsNeedEqueue(allowCallChainReentrancy, out bool needEqueue, out long callChainId);
-            if (needEqueue)
+            long callChainId;
+            bool needEnqueue;
+            if (!isAwait)
+            {
+                callChainId = Interlocked.Increment(ref idCounter);
+                needEnqueue = true;
+            }
+            else
+            {
+                IsNeedEnqueue(out needEnqueue, out callChainId);
+            }
+            if (needEnqueue)
             {
                 FuncAsyncWrapper<T> at = new FuncAsyncWrapper<T>(work);
                 at.Owner = this;

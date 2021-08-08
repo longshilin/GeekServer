@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Geek.Server
@@ -11,13 +12,12 @@ namespace Geek.Server
         public abstract string GetTrace();
         public abstract void ForceSetResult();
         public long CallChainId { get; set; }
+        public bool CanBeInterleaved { get; set; }
         protected void SetContext()
         {
-            lock (Owner.Lockable)
-            {
-                RuntimeContext.SetContext(CallChainId);
-                Owner.curCallChainId = CallChainId;
-            }
+            RuntimeContext.SetContext(CallChainId);
+            Owner.curCallChainId = CallChainId;
+            Owner.CurCanBeInterleaved = CanBeInterleaved;
         }
         public void ResetContext()
         {
@@ -35,6 +35,7 @@ namespace Geek.Server
         public ActionWrapper(Action work)
         {
             this.Work = work;
+            CanBeInterleaved = work.Method.GetCustomAttribute(typeof(InterleaveWhenDeadlock)) != null;
             Tcs = new TaskCompletionSource<bool>();
         }
 
@@ -79,6 +80,7 @@ namespace Geek.Server
         public FuncWrapper(Func<T> work)
         {
             this.Work = work;
+            CanBeInterleaved = work.Method.GetCustomAttribute(typeof(InterleaveWhenDeadlock)) != null;
             this.Tcs = new TaskCompletionSource<T>();
         }
 
@@ -124,6 +126,7 @@ namespace Geek.Server
         public ActionAsyncWrapper(Func<Task> work)
         {
             this.Work = work;
+            CanBeInterleaved = work.Method.GetCustomAttribute(typeof(InterleaveWhenDeadlock)) != null;
             Tcs = new TaskCompletionSource<bool>();
         }
 
@@ -167,6 +170,7 @@ namespace Geek.Server
         public FuncAsyncWrapper(Func<Task<T>> work)
         {
             this.Work = work;
+            CanBeInterleaved = work.Method.GetCustomAttribute(typeof(InterleaveWhenDeadlock)) != null;
             this.Tcs = new TaskCompletionSource<T>();
         }
 

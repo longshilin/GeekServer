@@ -204,7 +204,7 @@ namespace Geek.Server
                         var actor = await ActorManager.Get<ComponentActor>(state.Id);
                         _ = actor.SendAsync(() => {
                             state.SavedToDB();
-                        });
+                        }, false);
                     }
                 }
                 await Task.Delay(100);
